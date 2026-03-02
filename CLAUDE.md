@@ -88,6 +88,7 @@ Choice fields use `.Value` accessor (e.g., `Stage.Value`, `'RAG Status'.Value`).
 | Display Name | Internal SP field | Type |
 |---|---|---|
 | Title | `Title` | string |
+| Project Tier | `Project_x0020_Tier` | Choice (required; values: "Tier 1: Strategic Portfolio", "Tier 2: ...") |
 | Department | `field_1` | Choice |
 | Support Function(s) | `field_2` | Multi-choice |
 | BU | `field_3` | Choice |
@@ -151,3 +152,59 @@ If(rag="Red", RGBA(196,43,28,1), rag="Amber", RGBA(210,130,0,1), RGBA(0,145,65,1
 ```
 Filter([@'Project Portfolio Tracker'], Stage.Value <> "Cancelled", Stage.Value <> "Completed")
 ```
+
+**BrowseGallery1 Items formula** — 5-condition filter + sort (defined in both Controls/4.json and BrowseScreen1.pa.yaml):
+```
+SortByColumns(Filter([@'Project Portfolio Tracker'],
+  StartsWith(Title, TextSearchBox1.Text),
+  (!chk_MyProjects.Value || 'Executive Sponsor'.Email = User().Email || User().Email in 'Project Stakeholders'.Email),
+  (IsBlank(drp_Department.Selected.Value) || Department.Value = drp_Department.Selected.Value),
+  Stage.Value <> "Cancelled", Stage.Value <> "Completed",
+  (!chk_TierFilter.Value || 'Project Tier'.Value = "Tier 1: Strategic Portfolio")
+), "Title", If(SortDescending1, SortOrder.Descending, SortOrder.Ascending))
+```
+
+## Adding Controls to Controls JSON
+
+### Global ID tracking
+
+Every control in all `Controls/*.json` files requires two globally unique integers:
+- `ControlUniqueId` — unique across the entire app
+- `PublishOrderIndex` — unique across the entire app
+
+Before adding new controls, grep all Controls JSON files to find the current maximums:
+```bash
+grep -h '"ControlUniqueId"' /tmp/msapp_extracted/Controls/*.json | sort -t'"' -k4 -n | tail -3
+grep -h '"PublishOrderIndex"' /tmp/msapp_extracted/Controls/*.json | sort -t':' -k2 -n | tail -3
+```
+
+As of 2026-03-02: ControlUniqueId max = 274, PublishOrderIndex max = 265. Use next available integers for new controls.
+
+### TypedDataCard (ComboBox) pattern — CRITICAL
+
+When adding a new single-select Choice field card to `EditForm1`, **copy all properties from an existing working card** (`Department_DataCard2` / `DataCardValue10` in Controls/65.json is the reference). Omitting properties causes failures:
+
+- Missing `Fill` → black background on the ComboBox
+- Missing `Template: ListItemTemplate.Single` → broken dropdown rendering
+- Missing `NavigateFields`, `Color`, `BorderStyle`, `BorderThickness`, `Size`, etc. → visual and interaction defects
+
+The `ControlPropertyState` array uses two formats that must both be present:
+- Simple strings: `"BorderColor"` — for standard overridable properties
+- Objects with `AutoRuleBindingEnabled`: for data-bound properties (`Items`, `DefaultSelectedItems`, `SelectMultiple`, `BorderColor`, `DisplayMode`, `Tooltip`)
+
+### EditForm1 DataCard Y ordering
+
+The `Y` property on `DataCard` children of `EditForm1` is an **ordinal sort key** (0, 1, 2...), not a pixel value. The form engine uses these to stack cards vertically. To insert a card at position N, increment all existing cards with Y ≥ N from highest to lowest (to avoid double-incrementing). Script pattern:
+
+```python
+import re, json
+# Load JSON, find all Y rules where int(value) >= insert_position
+# Sort descending by value before incrementing
+```
+
+### Screen header pattern
+
+Every screen uses the same 88px blue header bar:
+- `RectQuickActionBar*` — `Fill: RGBA(56, 96, 178, 1)`, `Height: 88`
+- Back/Cancel icon at X=0, Accept/Submit icon at X=Parent.Width-158
+- `LblAppName*` — white bold label between the icons
