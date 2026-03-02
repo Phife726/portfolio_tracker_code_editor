@@ -38,8 +38,9 @@ cd /tmp/msapp_extracted && zip /workspaces/portfolio_tracker_code_editor/Americh
   .gitignore Header.json Properties.json AppCheckerResult.sarif \
   References/AuxDataMap.json References/Themes.json References/ModernThemes.json \
   References/DataSources.json References/Templates.json References/Resources.json \
-  Controls/1.json Controls/4.json Controls/64.json \
-  Controls/129.json Controls/382.json Controls/388.json \
+  Controls/1.json Controls/4.json Controls/24.json \
+  Controls/65.json Controls/197.json Controls/217.json \
+  Resources/PublishInfo.json \
   Src/App.pa.yaml Src/HomeScreen.pa.yaml Src/BrowseScreen1.pa.yaml \
   Src/DetailScreen2.pa.yaml Src/EditScreen1.pa.yaml \
   Src/StatusUpdateScreen_2.pa.yaml Src/_EditorState.pa.yaml
@@ -69,10 +70,10 @@ BrowseScreen1 → DetailScreen2 (read-only detail view)
 |---|---|
 | `Controls/1.json` | App |
 | `Controls/4.json` | BrowseScreen1 |
-| `Controls/64.json` | DetailScreen2 |
-| `Controls/129.json` | EditScreen1 |
-| `Controls/382.json` | HomeScreen |
-| `Controls/388.json` | StatusUpdateScreen_2 |
+| `Controls/24.json` | DetailScreen2 |
+| `Controls/65.json` | EditScreen1 |
+| `Controls/197.json` | HomeScreen |
+| `Controls/217.json` | StatusUpdateScreen_2 |
 
 ### Global Variables (initialized in App.pa.yaml OnStart)
 
