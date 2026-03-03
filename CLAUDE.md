@@ -88,12 +88,14 @@ Choice fields use `.Value` accessor (e.g., `Stage.Value`, `'RAG Status'.Value`).
 | Display Name | Internal SP field | Type |
 |---|---|---|
 | Title | `Title` | string |
-| Project Tier | `Project_x0020_Tier` | Choice (required; values: "Tier 1: Strategic Portfolio", "Tier 2: ...") |
+| Project Tier | `Project_x0020_Tier` | Choice (required; default: "Tier 1: Strategic Portfolio"; values dynamically loaded from SP) |
 | Department | `field_1` | Choice |
 | Support Function(s) | `field_2` | Multi-choice |
 | BU | `field_3` | Choice |
 | SBG | `field_4` | Multi-choice |
 | Site(s) | `field_5` | Multi-choice |
+| Executive Sponsor | `Executive_x0020_Sponsor` | People (single; accessed as `.Email` in Power Fx) |
+| Project Stakeholders | `Project_x0020_Lead` | People (multi-value array; accessed as `.Email` with `in` operator) |
 | Pillar | `field_8` | Choice |
 | Category | `field_7` | Choice |
 | Priority | `field_9` | Choice |
@@ -111,6 +113,8 @@ Choice fields use `.Value` accessor (e.g., `Stage.Value`, `'RAG Status'.Value`).
 | Additional Details | `field_17` | string |
 | Mandatory | `Mandatory` | boolean (default: false) |
 | Recurring | `Recurring_2` | boolean (default: false) |
+
+> **Note**: "Project Stakeholders" display name maps to the internal SP field `Project_x0020_Lead` — this mismatch is a SharePoint naming artifact. The `in` operator works for multi-value People: `User().Email in 'Project Stakeholders'.Email`.
 
 ## Power Fx Conventions
 
@@ -201,6 +205,14 @@ import re, json
 # Load JSON, find all Y rules where int(value) >= insert_position
 # Sort descending by value before incrementing
 ```
+
+## Feature Design Documentation
+
+Feature specifications and implementation plans live in `docs/plans/`. Each feature typically has two files:
+- `*-design.md` — UX and data model decisions, approved before implementation
+- `*-implementation.md` — step-by-step implementation plan with exact JSON/YAML changes
+
+Consult these before modifying existing features to understand design intent.
 
 ### Screen header pattern
 
